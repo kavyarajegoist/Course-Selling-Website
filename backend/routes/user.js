@@ -15,7 +15,15 @@ userRouter.post("/signup",async(req,res)=>{
         
         if(!parseData.success)
         {
-                res.json({message :"Invalid Input formats"});
+                const errorMessages = parseData.error.errors.map(error => ({
+                        field: error.path.join('.'),
+                        message: error.message
+                    }));
+                    
+                    return res.status(400).json({
+                        success: false,
+                        errors: errorMessages
+                    });
         }
 
         else{
@@ -26,6 +34,13 @@ userRouter.post("/signup",async(req,res)=>{
 
                 try
                 {
+                        const existingUser = await userModel.findOne({ email });
+                        if (existingUser) {
+                            return res.status(400).json({
+                                success: false,
+                                message: "User already exists"
+                            });
+                        }
                 const hashPassword = bcrypt.hashSync(password,saltRound);
 
                 await userModel.create({
@@ -39,6 +54,9 @@ userRouter.post("/signup",async(req,res)=>{
                 }
                 catch(err){
                         console.log(err);
+                        res.status(500).json({
+                                message: "Internal server error"
+                        })
                 }
         }
 });
@@ -73,14 +91,18 @@ userRouter.post("/signin",async(req,res)=>{
 userRouter.get("/purchases",userMiddleware,async(req,res)=>{
     try{
            const userId = req.userId;
-           const course = await purchaseModel.find(userId);
+           const purchase = await purchaseModel.find({user_id:userId});
 
+           const courseData = await courseModel.find({_id:{$in:purchase.map(x=>x.course_id)}})
+                console.log(purchase);
            res.json({
-                course
+                purchase,
+                courseData
            })
 
         }
         catch(err){
+                console.log(err);
                 res.json({message:"Internal Server Error."})
         }
       

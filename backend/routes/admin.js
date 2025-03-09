@@ -94,12 +94,45 @@ adminRouter.post("/course",adminMiddleware,async(req,res)=>{
     }
         
     } catch (err) {
+        console.log(err);
         res.json("Internal server error.")
     }
 })
 
-adminRouter.put("/coures",(req,res)=>{
+adminRouter.put("/course",adminMiddleware,async(req,res)=>{
    
+    try {
+        const adminId = req.adminId;
+        const parseData = courseBody.safeParse(req.body);
+        
+        if(!parseData.success)
+        {
+            return res.status(400).json({message:"Invalid Input format."})
+        }
+        const {title,description,price,imageUrl,courseId} = req.body;
+
+        const course = await courseModel.updateOne({
+            _id: courseId,
+            creator_id:adminId
+        },
+    {
+        title:title,
+        description:description,
+        price:price,
+        imageUrl:imageUrl
+    });
+    
+        if(!course.matchedCount)
+        {
+            res.status(400).json({message:"Course not found."})
+        }
+
+        res.json({message:"Course Updated Successfully.", courseId:courseId})
+
+    } catch (error) {
+        
+    }
+    
 })
 
 adminRouter.get("/course/bulk",adminMiddleware,async(req,res)=>{
@@ -122,3 +155,4 @@ adminRouter.get("/course/bulk",adminMiddleware,async(req,res)=>{
 module.exports = {
     adminRouter
 }
+//67975425f21fe774d4186146
