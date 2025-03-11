@@ -1,7 +1,8 @@
 
 import { zodResolver } from '@hookform/resolvers/zod';
+import axios from 'axios';
 import {SubmitHandler, useForm} from 'react-hook-form'
-import {promise, z} from 'zod';
+import {z} from 'zod';
 
 const schema = z.object({
   email:z.string().email(),
@@ -11,11 +12,14 @@ const schema = z.object({
 type FormFields = z.infer<typeof schema>
 
 const SignUp = () => {
-  const {register,handleSubmit,setError,formState:{errors,isSubmitting},} = useForm<FormFields>({resolver:zodResolver(schema)});
+  const {register,handleSubmit,formState:{errors,isSubmitting},} = useForm<FormFields>({resolver:zodResolver(schema)});
 
   const onSubmit:SubmitHandler<FormFields> = async(data)=>{
-  console.log(data);
-  
+   const response = await axios.post("http://localhost:3000/user/signup",
+    
+   )
+  if (response)  
+    console.log(data);
   }
   return (
     <>
