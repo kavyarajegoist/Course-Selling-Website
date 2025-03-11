@@ -15,10 +15,8 @@ const SignUp = () => {
   const {register,handleSubmit,formState:{errors,isSubmitting},} = useForm<FormFields>({resolver:zodResolver(schema)});
 
   const onSubmit:SubmitHandler<FormFields> = async(data)=>{
-   const response = await axios.post("http://localhost:3000/user/signup",
-    
-   )
-  if (response)  
+  
+ 
     console.log(data);
   }
   return (
